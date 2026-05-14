@@ -1,0 +1,11 @@
+.mine-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+.mine-title {
+  font-size: 32rpx;
+  color: #999;
+}

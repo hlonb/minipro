@@ -1,0 +1,18 @@
+<view class="reserve-popup-mask" wx:if="{{show}}" bind:tap="onClose">
+  <view class="reserve-popup-container" catch:tap="">
+    <view class="reserve-popup-header">
+      <text class="reserve-popup-title">{{title}}</text>
+      <view class="reserve-popup-close" bind:tap="onClose">
+        <t-icon name="close" size="44rpx" color="#999" />
+      </view>
+    </view>
+    <view class="reserve-popup-content">
+      <text class="reserve-popup-text">{{content}}</text>
+    </view>
+    <view class="reserve-popup-btn-wrap">
+      <button class="reserve-popup-btn" bind:tap="onCopy">
+        {{type === 'wechat' ? '复制微信号' : '复制电话号码'}}
+      </button>
+    </view>
+  </view>
+</view>

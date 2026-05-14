@@ -1,0 +1,245 @@
+<view class="manage-page">
+  <!-- Tab切换 -->
+  <view class="tab-bar">
+    <view class="tab-item {{activeTab === 0 ? 'tab-active' : ''}}" data-tab="{{0}}" bind:tap="onTabChange">
+      DM管理
+    </view>
+    <view class="tab-item {{activeTab === 1 ? 'tab-active' : ''}}" data-tab="{{1}}" bind:tap="onTabChange">
+      剧本管理
+    </view>
+    <view class="tab-item {{activeTab === 2 ? 'tab-active' : ''}}" data-tab="{{2}}" bind:tap="onTabChange">
+      店铺信息
+    </view>
+  </view>
+
+  <!-- DM管理 -->
+  <view wx:if="{{activeTab === 0}}">
+    <view class="add-btn" bind:tap="onShowAddStaff">
+      <t-icon name="add" size="40rpx" color="#fff" />
+      <text class="add-btn-text">添加DM</text>
+    </view>
+
+    <view class="item-list" wx:if="{{!loading}}">
+      <view class="item-card" wx:for="{{staffList}}" wx:key="_id">
+        <image class="item-avatar" src="{{item.avatar}}" mode="aspectFill" />
+        <text class="item-name">{{item.name}}</text>
+        <view class="item-delete" data-id="{{item._id}}" data-name="{{item.name}}" data-type="staff" catch:tap="onDeleteItem">
+          <t-icon name="close" size="32rpx" color="#999" />
+        </view>
+      </view>
+      <view class="empty-tip" wx:if="{{staffList.length === 0}}">
+        <text class="empty-tip-text">暂无DM，点击上方按钮添加</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 剧本管理 -->
+  <view wx:if="{{activeTab === 1}}">
+    <view class="add-btn add-btn-script" bind:tap="onShowAddScript">
+      <t-icon name="add" size="40rpx" color="#fff" />
+      <text class="add-btn-text">添加剧本</text>
+    </view>
+
+    <view class="item-list" wx:if="{{!loading}}">
+      <view class="script-card" wx:for="{{scriptList}}" wx:key="_id">
+        <image class="script-card-image" src="{{item.image}}" mode="aspectFill" />
+        <view class="script-card-info">
+          <text class="script-card-name">{{item.name}}</text>
+          <view class="script-card-meta">
+            <text class="script-card-meta-item">{{item.playerCount || '-'}}人</text>
+            <text class="script-card-meta-item">{{item.difficulty || '-'}}</text>
+          </view>
+          <view class="script-card-meta">
+            <text class="script-card-meta-item" wx:for="{{item.releaseType}}" wx:for-item="rt" wx:key="*this">{{rt}}</text>
+            <text class="script-card-meta-item" wx:for="{{item.type}}" wx:for-item="tp" wx:key="*this">{{tp}}</text>
+            <text class="script-card-meta-item" wx:for="{{item.tagLabel}}" wx:for-item="tl" wx:key="*this">{{tl}}</text>
+          </view>
+          <view class="script-card-tags">
+            <text class="script-card-tag" wx:for="{{item.tags}}" wx:for-item="tag" wx:key="*this">{{tag}}</text>
+          </view>
+          <text class="script-card-price">¥{{item.price}}/人</text>
+        </view>
+        <view class="item-delete" data-id="{{item._id}}" data-name="{{item.name}}" data-type="script" catch:tap="onDeleteItem">
+          <t-icon name="close" size="32rpx" color="#999" />
+        </view>
+      </view>
+      <view class="empty-tip" wx:if="{{scriptList.length === 0}}">
+        <text class="empty-tip-text">暂无剧本，点击上方按钮添加</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 店铺信息 -->
+  <view wx:if="{{activeTab === 2}}">
+    <view class="shop-edit-card" wx:if="{{!loading}}">
+      <view class="shop-info-row">
+        <text class="shop-info-label">店铺名称</text>
+        <text class="shop-info-value">{{shopInfo.name || '未设置'}}</text>
+      </view>
+      <view class="shop-info-row">
+        <text class="shop-info-label">地址</text>
+        <text class="shop-info-value">{{shopInfo.address || '未设置'}}</text>
+      </view>
+      <view class="shop-info-row">
+        <text class="shop-info-label">微信号</text>
+        <text class="shop-info-value">{{shopInfo.wechatId || '未设置'}}</text>
+      </view>
+      <view class="shop-info-row shop-info-row-last">
+        <text class="shop-info-label">联系电话</text>
+        <text class="shop-info-value">{{shopInfo.phone || '未设置'}}</text>
+      </view>
+      <view class="edit-shop-btn" bind:tap="onShowEditShop">
+        <t-icon name="edit" size="36rpx" color="#fff" />
+        <text class="edit-shop-btn-text">编辑店铺信息</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="loading-wrap" wx:if="{{loading}}">
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <!-- 添加DM弹窗 -->
+  <view class="dialog-mask" wx:if="{{showAddDialog && dialogType === 'staff'}}" bind:tap="onAddDialogClose">
+    <view class="dialog-box" catch:tap="noop">
+      <view class="dialog-header">
+        <text class="dialog-title">添加DM</text>
+        <view class="dialog-close" catch:tap="onAddDialogClose">
+          <t-icon name="close" size="44rpx" color="#999" />
+        </view>
+      </view>
+      <view class="dialog-body">
+        <view class="avatar-upload" catch:tap="onChooseAvatar">
+          <image class="avatar-preview" wx:if="{{newStaffAvatar}}" src="{{newStaffAvatar}}" mode="aspectFill" />
+          <view class="avatar-placeholder" wx:else>
+            <t-icon name="add" size="48rpx" color="#ccc" />
+            <text class="avatar-placeholder-text">选择头像</text>
+          </view>
+        </view>
+        <view class="input-wrap">
+          <text class="input-label">DM名称</text>
+          <input class="input-field" placeholder="请输入DM名称" value="{{newStaffName}}" bindinput="onStaffNameInput" />
+        </view>
+      </view>
+      <view class="dialog-footer">
+        <view class="confirm-btn" catch:tap="onAddStaff">确认添加</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 添加剧本弹窗 -->
+  <view class="dialog-mask" wx:if="{{showAddDialog && dialogType === 'script'}}" bind:tap="onAddDialogClose">
+    <view class="dialog-box dialog-box-wide" catch:tap="noop">
+      <view class="dialog-header">
+        <text class="dialog-title">添加剧本</text>
+        <view class="dialog-close" catch:tap="onAddDialogClose">
+          <t-icon name="close" size="44rpx" color="#999" />
+        </view>
+      </view>
+      <scroll-view class="dialog-body dialog-body-scroll" scroll-y enhanced show-scrollbar="{{false}}">
+        <view class="script-image-upload" catch:tap="onChooseScriptImage">
+          <image class="script-image-preview" wx:if="{{newScriptImage}}" src="{{newScriptImage}}" mode="aspectFill" />
+          <view class="script-image-placeholder" wx:else>
+            <t-icon name="add" size="48rpx" color="#ccc" />
+            <text class="script-image-placeholder-text">选择剧本封面</text>
+          </view>
+        </view>
+        <view class="input-wrap">
+          <text class="input-label">剧本名称</text>
+          <input class="input-field" placeholder="请输入剧本名称" value="{{newScriptName}}" bindinput="onScriptNameInput" />
+        </view>
+        <view class="input-wrap">
+          <text class="input-label">风格标签</text>
+          <input class="input-field" placeholder="多个标签用逗号分隔，如：悬疑,推理" value="{{newScriptTags}}" bindinput="onScriptTagsInput" />
+        </view>
+        <view class="input-wrap">
+          <text class="input-label">剧本简介</text>
+          <textarea class="input-field textarea-field" placeholder="请输入剧本简介" value="{{newScriptDesc}}" bindinput="onScriptDescInput" auto-height maxlength="200" />
+        </view>
+        <view class="input-wrap">
+          <text class="input-label">价格(元/人)</text>
+          <input class="input-field" placeholder="请输入价格" type="digit" value="{{newScriptPrice}}" bindinput="onScriptPriceInput" />
+        </view>
+        <view class="select-group">
+          <text class="select-label">人数（单选）</text>
+          <view class="select-options">
+            <view class="select-option {{newScriptPlayerCount === item ? 'select-option-active' : ''}}" wx:for="{{playerOptions}}" wx:key="*this" data-value="{{item}}" catch:tap="onSelectPlayerCount">{{item}}</view>
+          </view>
+        </view>
+        <view class="select-group">
+          <text class="select-label">难度（单选）</text>
+          <view class="select-options">
+            <view class="select-option {{selectedDifficulty === item ? 'select-option-active' : ''}}" wx:for="{{difficultyOptions}}" wx:key="*this" data-value="{{item}}" catch:tap="onSelectDifficulty">{{item}}</view>
+          </view>
+        </view>
+        <view class="select-group">
+          <text class="select-label">发售（多选）</text>
+          <view class="select-options">
+            <view class="select-option {{selectedRelease.indexOf(item) >= 0 ? 'select-option-active' : ''}}" wx:for="{{releaseOptions}}" wx:key="*this" data-value="{{item}}" catch:tap="onSelectRelease">{{item}}</view>
+          </view>
+        </view>
+        <view class="select-group">
+          <text class="select-label">类型（多选）</text>
+          <view class="select-options">
+            <view class="select-option {{selectedScriptType.indexOf(item) >= 0 ? 'select-option-active' : ''}}" wx:for="{{typeOptions}}" wx:key="*this" data-value="{{item}}" catch:tap="onSelectScriptType">{{item}}</view>
+          </view>
+        </view>
+        <view class="select-group">
+          <text class="select-label">标签（多选）</text>
+          <view class="select-options">
+            <view class="select-option {{selectedTagLabel.indexOf(item) >= 0 ? 'select-option-active' : ''}}" wx:for="{{tagLabelOptions}}" wx:key="*this" data-value="{{item}}" catch:tap="onSelectTagLabel">{{item}}</view>
+          </view>
+        </view>
+      </scroll-view>
+      <view class="dialog-footer">
+        <view class="confirm-btn" catch:tap="onAddScript">确认添加</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 编辑店铺信息弹窗 -->
+  <view class="dialog-mask" wx:if="{{showEditShopDialog}}" bind:tap="onEditShopDialogClose">
+    <view class="dialog-box" catch:tap="noop">
+      <view class="dialog-header">
+        <text class="dialog-title">编辑店铺信息</text>
+        <view class="dialog-close" catch:tap="onEditShopDialogClose">
+          <t-icon name="close" size="44rpx" color="#999" />
+        </view>
+      </view>
+      <view class="dialog-body">
+        <view class="input-wrap">
+          <text class="input-label">店铺名称</text>
+          <input class="input-field" placeholder="请输入店铺名称" value="{{editShopName}}" bindinput="onEditShopNameInput" />
+        </view>
+        <view class="input-wrap">
+          <text class="input-label">地址</text>
+          <input class="input-field" placeholder="请输入店铺地址" value="{{editShopAddress}}" bindinput="onEditShopAddressInput" />
+        </view>
+        <view class="input-wrap">
+          <text class="input-label">微信号</text>
+          <input class="input-field" placeholder="请输入微信号" value="{{editShopWechatId}}" bindinput="onEditShopWechatIdInput" />
+        </view>
+        <view class="input-wrap">
+          <text class="input-label">联系电话</text>
+          <input class="input-field" placeholder="请输入联系电话" type="number" value="{{editShopPhone}}" bindinput="onEditShopPhoneInput" />
+        </view>
+      </view>
+      <view class="dialog-footer">
+        <view class="confirm-btn confirm-btn-primary {{shopSaving ? 'confirm-btn-disabled' : ''}}" catch:tap="onSaveShopInfo">
+          {{shopSaving ? '保存中...' : '保存'}}
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 删除确认弹窗 -->
+  <t-dialog
+    visible="{{showDeleteConfirm}}"
+    title="确认删除"
+    content="确定要删除「{{deleteName}}」吗？"
+    confirm-btn="删除"
+    cancel-btn="取消"
+    bind:confirm="onConfirmDelete"
+    bind:cancel="onDeleteConfirmClose"
+  />
+</view>

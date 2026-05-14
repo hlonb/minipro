@@ -1,0 +1,116 @@
+<view class="scripts-page">
+  <!-- 篩選區 -->
+  <view class="filter-section">
+    <!-- 人数（单选） -->
+    <view class="filter-group">
+      <text class="filter-label">人数（单选）</text>
+      <scroll-view class="filter-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+        <view class="filter-options">
+          <view
+            class="filter-option {{selectedPlayer === option ? 'filter-option-active' : ''}}"
+            wx:for="{{playerOptions}}"
+            wx:for-item="option"
+            wx:key="*this"
+            data-value="{{option}}"
+            bind:tap="onFilterPlayer"
+          >{{option}}</view>
+        </view>
+      </scroll-view>
+    </view>
+
+    <!-- 难度（单选） -->
+    <view class="filter-group">
+      <text class="filter-label">难度（单选）</text>
+      <scroll-view class="filter-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+        <view class="filter-options">
+          <view
+            class="filter-option {{selectedDifficulty === option ? 'filter-option-active' : ''}}"
+            wx:for="{{difficultyOptions}}"
+            wx:for-item="option"
+            wx:key="*this"
+            data-value="{{option}}"
+            bind:tap="onFilterDifficulty"
+          >{{option}}</view>
+        </view>
+      </scroll-view>
+    </view>
+
+    <!-- 发售（多选） -->
+    <view class="filter-group">
+      <text class="filter-label">发售（多选）</text>
+      <scroll-view class="filter-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+        <view class="filter-options">
+          <view
+            class="filter-option {{option === '全部' ? '' : (selectedRelease.indexOf(option) >= 0 ? 'filter-option-active' : '')}}"
+            wx:for="{{releaseOptions}}"
+            wx:for-item="option"
+            wx:key="*this"
+            data-value="{{option}}"
+            bind:tap="onFilterRelease"
+          >{{option}}</view>
+        </view>
+      </scroll-view>
+    </view>
+
+    <!-- 类型（多选） -->
+    <view class="filter-group">
+      <text class="filter-label">类型（多选）</text>
+      <scroll-view class="filter-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+        <view class="filter-options">
+          <view
+            class="filter-option {{option === '全部' ? '' : (selectedType.indexOf(option) >= 0 ? 'filter-option-active' : '')}}"
+            wx:for="{{typeOptions}}"
+            wx:for-item="option"
+            wx:key="*this"
+            data-value="{{option}}"
+            bind:tap="onFilterType"
+          >{{option}}</view>
+        </view>
+      </scroll-view>
+    </view>
+
+    <!-- 标签（多选） -->
+    <view class="filter-group">
+      <text class="filter-label">标签（多选）</text>
+      <scroll-view class="filter-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+        <view class="filter-options">
+          <view
+            class="filter-option {{option === '全部' ? '' : (selectedTag.indexOf(option) >= 0 ? 'filter-option-active' : '')}}"
+            wx:for="{{tagOptions}}"
+            wx:for-item="option"
+            wx:key="*this"
+            data-value="{{option}}"
+            bind:tap="onFilterTag"
+          >{{option}}</view>
+        </view>
+      </scroll-view>
+    </view>
+  </view>
+
+  <!-- 结果列表 -->
+  <view class="result-list">
+    <view class="result-card" wx:for="{{filteredList}}" wx:key="_id">
+      <image class="result-image" src="{{item.image}}" mode="aspectFill" />
+      <view class="result-info">
+        <text class="result-name">{{item.name}}</text>
+        <view class="result-meta">
+          <text class="result-meta-item">{{item.playerCount || '-'}}人</text>
+          <text class="result-meta-item">{{item.difficulty || '-'}}</text>
+          <text class="result-meta-item" wx:for="{{item.releaseType}}" wx:for-item="rt" wx:key="*this">{{rt}}</text>
+        </view>
+        <view class="result-tags">
+          <text class="result-tag" wx:for="{{item.type}}" wx:for-item="tp" wx:key="*this">{{tp}}</text>
+          <text class="result-tag" wx:for="{{item.tags}}" wx:for-item="tag" wx:key="*this">{{tag}}</text>
+        </view>
+        <view class="result-bottom">
+          <text class="result-price">¥{{item.price}}/人</text>
+          <text class="result-type-badge" wx:for="{{item.tagLabel}}" wx:for-item="tl" wx:key="*this">{{tl}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="result-empty" wx:if="{{filteredList.length === 0}}">
+      <text class="result-empty-text">没有符合条件的剧本</text>
+    </view>
+  </view>
+</view>

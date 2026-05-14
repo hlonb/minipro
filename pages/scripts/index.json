@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "剧本库",
+  "usingComponents": {
+    "t-icon": "tdesign-miniprogram/icon/icon"
+  }
+}

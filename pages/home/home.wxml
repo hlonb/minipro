@@ -1,0 +1,108 @@
+<view class="home-page">
+  <!-- 店铺信息 -->
+  <view class="shop-info">
+    <view class="shop-info-left">
+      <view class="shop-icon-wrap">
+        <t-icon prefix="wr" name="store" size="56rpx" color="#fa4126" />
+      </view>
+    </view>
+    <view class="shop-info-right">
+      <text class="shop-name">{{shopInfo.name}}</text>
+      <view class="shop-address">
+        <t-icon prefix="wr" name="location" size="28rpx" color="#999" />
+        <text class="shop-address-text">{{shopInfo.address}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 预约按钮 -->
+  <view class="reserve-btns">
+    <view class="reserve-btn reserve-btn-wechat" bind:tap="onWechatReserve">
+      <t-icon prefix="wr" name="wechat" size="36rpx" color="#07c160" />
+      <text class="reserve-btn-text">微信预约</text>
+    </view>
+    <view class="reserve-btn reserve-btn-phone" bind:tap="onPhoneReserve">
+      <t-icon prefix="wr" name="telephone" size="36rpx" color="#fa4126" />
+      <text class="reserve-btn-text">电话预约</text>
+    </view>
+  </view>
+
+  <!-- 本店DM -->
+  <view class="dm-section">
+    <view class="section-header">
+      <text class="section-title">本店DM</text>
+    </view>
+    <scroll-view class="dm-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+      <view class="dm-list">
+        <view
+          class="dm-item"
+          wx:for="{{staffList}}"
+          wx:key="_id"
+          data-id="{{item._id}}"
+          bind:tap="onStaffClick"
+        >
+          <image class="dm-avatar" src="{{item.avatar}}" mode="aspectFill" />
+          <text class="dm-name">{{item.name}}</text>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 剧本推荐 -->
+  <view class="script-section" wx:if="{{scriptList.length > 0}}">
+    <view class="section-header">
+      <text class="section-title">剧本推荐</text>
+    </view>
+
+    <view class="script-detail">
+      <text class="script-detail-name">{{scriptList[currentScriptIndex].name}}</text>
+      <view class="script-detail-tags">
+        <text
+          class="script-tag"
+          wx:for="{{scriptList[currentScriptIndex].tags}}"
+          wx:for-item="tag"
+          wx:key="*this"
+        >{{tag}}</text>
+      </view>
+      <text class="script-detail-desc">{{scriptList[currentScriptIndex].desc}}</text>
+      <view class="script-detail-price">
+        <text class="script-price-symbol">¥</text>
+        <text class="script-price-num">{{scriptList[currentScriptIndex].price}}</text>
+        <text class="script-price-unit">/人</text>
+      </view>
+    </view>
+
+    <scroll-view class="script-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+      <view class="script-image-list">
+        <view
+          class="script-image-item {{currentScriptIndex === index ? 'script-image-active' : ''}}"
+          wx:for="{{scriptList}}"
+          wx:key="_id"
+          data-index="{{index}}"
+          bind:tap="onScriptImageClick"
+        >
+          <image class="script-image" src="{{item.image}}" mode="aspectFill" />
+          <text class="script-image-name">{{item.name}}</text>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 微信预约弹窗 -->
+  <reserve-popup
+    show="{{showWechatPopup}}"
+    title="联系商家"
+    content="{{shopInfo.wechatId}}"
+    type="wechat"
+    bind:close="onWechatPopupClose"
+  />
+
+  <!-- 电话预约弹窗 -->
+  <reserve-popup
+    show="{{showPhonePopup}}"
+    title="联系商家"
+    content="{{shopInfo.phone}}"
+    type="phone"
+    bind:close="onPhonePopupClose"
+  />
+</view>
