@@ -47,9 +47,15 @@ Page({
     this.setData({ showPhonePopup: false });
   },
 
-  onStaffClick(e) {
+  onAvatarPreview(e) {
+    const { url } = e.currentTarget.dataset;
+    const urls = this.data.staffList.map(s => s.avatar);
+    wx.previewImage({ current: url, urls });
+  },
+
+  onScriptDetail(e) {
     const { id } = e.currentTarget.dataset;
-    wx.showToast({ title: `查看DM详情: ${id}`, icon: 'none' });
+    wx.navigateTo({ url: `/pages/script-detail/index?id=${id}` });
   },
 
   onScriptImageClick(e) {

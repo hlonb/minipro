@@ -95,4 +95,9 @@ Page({
     });
     this.setData({ filteredList: filtered });
   },
+
+  onScriptDetail(e) {
+    const { id } = e.currentTarget.dataset;
+    wx.navigateTo({ url: `/pages/script-detail/index?id=${id}` });
+  },
 });

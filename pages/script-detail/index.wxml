@@ -1,0 +1,50 @@
+<view class="detail-page" wx:if="{{!loading && script}}">
+  <!-- 顶部：图片 + 基本信息 -->
+  <view class="detail-header">
+    <image class="detail-cover" src="{{script.image}}" mode="aspectFill" data-url="{{script.image}}" bind:tap="onPreviewImage" data-urls="{{[script.image]}}" />
+    <view class="detail-info">
+      <text class="detail-name">{{script.name}}</text>
+      <view class="detail-tags" wx:if="{{script.tags.length > 0}}">
+        <text class="detail-tag" wx:for="{{script.tags}}" wx:key="*this">{{item}}</text>
+      </view>
+      <view class="detail-roles">
+        <text class="detail-role-item">{{script.maleCount || 0}}男</text>
+        <text class="detail-role-item">{{script.femaleCount || 0}}女</text>
+        <text class="detail-role-divider">|</text>
+        <text class="detail-role-item">{{script.duration || '-'}}</text>
+      </view>
+      <view class="detail-price">
+        <text class="detail-price-symbol">¥</text>
+        <text class="detail-price-num">{{script.price}}</text>
+        <text class="detail-price-unit">/人</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 剧本简介 -->
+  <view class="detail-section">
+    <text class="detail-section-title">剧本简介</text>
+    <text class="detail-desc">{{script.desc}}</text>
+  </view>
+
+  <!-- 图片展示 -->
+  <view class="detail-section" wx:if="{{script.images.length > 0}}">
+    <text class="detail-section-title">剧本图集</text>
+    <view class="detail-images">
+      <image
+        class="detail-image"
+        wx:for="{{script.images}}"
+        wx:key="*this"
+        src="{{item}}"
+        mode="widthFix"
+        data-url="{{item}}"
+        data-urls="{{script.images}}"
+        bind:tap="onPreviewImage"
+      />
+    </view>
+  </view>
+</view>
+
+<view class="loading-wrap" wx:if="{{loading}}">
+  <text class="loading-text">加载中...</text>
+</view>

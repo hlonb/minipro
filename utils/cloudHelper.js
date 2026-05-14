@@ -18,6 +18,10 @@ const seedScripts = [
     price: '128',
     image: 'https://tdesign.gtimg.com/miniprogram/template/retail/home/v2/banner1.png',
     playerCount: 6,
+    maleCount: 3,
+    femaleCount: 3,
+    duration: '4-5小时',
+    images: [],
     difficulty: '高阶',
     releaseType: ['城限'],
     type: ['推理'],
@@ -30,6 +34,10 @@ const seedScripts = [
     price: '158',
     image: 'https://tdesign.gtimg.com/miniprogram/template/retail/home/v2/banner2.png',
     playerCount: 7,
+    maleCount: 4,
+    femaleCount: 3,
+    duration: '5-6小时',
+    images: [],
     difficulty: '进阶',
     releaseType: ['独家'],
     type: ['惊悚', '推理'],
@@ -42,6 +50,10 @@ const seedScripts = [
     price: '98',
     image: 'https://tdesign.gtimg.com/miniprogram/template/retail/home/v2/banner3.png',
     playerCount: 5,
+    maleCount: 2,
+    femaleCount: 3,
+    duration: '3-4小时',
+    images: [],
     difficulty: '新手',
     releaseType: ['盒装'],
     type: ['情感', '还原'],
@@ -54,6 +66,10 @@ const seedScripts = [
     price: '138',
     image: 'https://tdesign.gtimg.com/miniprogram/template/retail/home/v2/banner4.png',
     playerCount: 8,
+    maleCount: 5,
+    femaleCount: 3,
+    duration: '5-6小时',
+    images: [],
     difficulty: '进阶',
     releaseType: ['城限'],
     type: ['机制', '推理'],
@@ -66,6 +82,10 @@ const seedScripts = [
     price: '88',
     image: 'https://tdesign.gtimg.com/miniprogram/template/retail/home/v2/banner5.png',
     playerCount: 4,
+    maleCount: 2,
+    femaleCount: 2,
+    duration: '3-4小时',
+    images: [],
     difficulty: '新手',
     releaseType: ['盒装'],
     type: ['情感'],
@@ -78,6 +98,10 @@ const seedScripts = [
     price: '108',
     image: 'https://tdesign.gtimg.com/miniprogram/template/retail/home/v2/banner6.png',
     playerCount: 9,
+    maleCount: 5,
+    femaleCount: 4,
+    duration: '4-5小时',
+    images: [],
     difficulty: '高阶',
     releaseType: ['独家'],
     type: ['阵营', '推理'],
@@ -90,6 +114,10 @@ const seedScripts = [
     price: '168',
     image: 'https://tdesign.gtimg.com/miniprogram/template/retail/home/v2/banner1.png',
     playerCount: 10,
+    maleCount: 5,
+    femaleCount: 5,
+    duration: '5-6小时',
+    images: [],
     difficulty: '高阶',
     releaseType: ['实景'],
     type: ['惊悚', '还原'],
@@ -102,6 +130,10 @@ const seedScripts = [
     price: '118',
     image: 'https://tdesign.gtimg.com/miniprogram/template/retail/home/v2/banner2.png',
     playerCount: 7,
+    maleCount: 4,
+    femaleCount: 3,
+    duration: '4-5小时',
+    images: [],
     difficulty: '进阶',
     releaseType: ['盒装'],
     type: ['阵营', '机制'],
@@ -114,6 +146,10 @@ const seedScripts = [
     price: '148',
     image: 'https://tdesign.gtimg.com/miniprogram/template/retail/home/v2/banner3.png',
     playerCount: 6,
+    maleCount: 3,
+    femaleCount: 3,
+    duration: '5-6小时',
+    images: [],
     difficulty: '高阶',
     releaseType: ['城限'],
     type: ['还原', '推理'],
@@ -126,6 +162,10 @@ const seedScripts = [
     price: '78',
     image: 'https://tdesign.gtimg.com/miniprogram/template/retail/home/v2/banner4.png',
     playerCount: 5,
+    maleCount: 2,
+    femaleCount: 3,
+    duration: '3-4小时',
+    images: [],
     difficulty: '新手',
     releaseType: ['盒装'],
     type: ['换了', '情感'],
@@ -219,12 +259,12 @@ export async function loadStaffList() {
   return getLocal(STAFF_KEY);
 }
 
-export async function addStaff(name, avatar) {
+export async function addStaff(name, avatar, gender) {
   if (cloudAvailable) {
     try {
       const db = wx.cloud.database();
       await db.collection('staff').add({
-        data: { name, avatar, createdAt: db.serverDate() },
+        data: { name, avatar, gender: gender || '男', createdAt: db.serverDate() },
       });
       return await loadStaffList();
     } catch (e) {
@@ -273,6 +313,22 @@ export async function loadScriptList() {
   return getLocal(SCRIPT_KEY);
 }
 
+export async function loadScriptById(id) {
+  if (cloudAvailable) {
+    try {
+      const db = wx.cloud.database();
+      const res = await db.collection('scripts').doc(id).get();
+      return res.data;
+    } catch (e) {
+      console.error('loadScriptById fail:', e);
+      const list = getLocal(SCRIPT_KEY);
+      return list.find(s => s._id === id) || null;
+    }
+  }
+  const list = getLocal(SCRIPT_KEY);
+  return list.find(s => s._id === id) || null;
+}
+
 export async function addScript(script) {
   if (cloudAvailable) {
     try {
@@ -285,6 +341,10 @@ export async function addScript(script) {
           price: script.price,
           image: script.image,
           playerCount: script.playerCount || 0,
+          maleCount: script.maleCount || 0,
+          femaleCount: script.femaleCount || 0,
+          duration: script.duration || '',
+          images: script.images || [],
           difficulty: script.difficulty || '',
           releaseType: script.releaseType || [],
           type: script.type || [],
@@ -347,22 +407,15 @@ export async function loadShopInfo() {
       const res = await db.collection('shop').doc('shop_main').get();
       return res.data;
     } catch (e) {
-      if (e.errCode === -1 || (e.errMsg && e.errMsg.includes('not found'))) {
-        try {
-          const db = wx.cloud.database();
-          await db.collection('shop').add({
-            data: { _id: 'shop_main', ...defaultShopInfo, updatedAt: db.serverDate() },
-          });
-        } catch (e2) {
-          console.error('shop seed insert fail:', e2);
-        }
-        return { ...defaultShopInfo };
-      }
       console.error('loadShopInfo cloud fail:', e);
       try {
-        const local = wx.getStorageSync(SHOP_KEY);
-        if (local && local.name) return local;
-      } catch (e3) {}
+        const db = wx.cloud.database();
+        await db.collection('shop').add({
+          data: { _id: 'shop_main', ...defaultShopInfo, updatedAt: db.serverDate() },
+        });
+      } catch (e2) {
+        console.error('shop seed insert fail:', e2);
+      }
       return { ...defaultShopInfo };
     }
   }

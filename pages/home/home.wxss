@@ -139,8 +139,37 @@ page {
 .dm-name {
   font-size: 22rpx;
   color: #666;
-  margin-top: 8rpx;
   white-space: nowrap;
+}
+
+.dm-name-wrap {
+  display: flex;
+  align-items: center;
+  margin-top: 8rpx;
+}
+
+.dm-gender-icon {
+  width: 28rpx;
+  height: 28rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 4rpx;
+}
+
+.dm-gender-icon-male {
+  background: #4a90d9;
+}
+
+.dm-gender-icon-female {
+  background: #f5a0b0;
+}
+
+.dm-gender-icon-text {
+  font-size: 18rpx;
+  color: #fff;
+  line-height: 1;
 }
 
 /* 剧本推荐 */

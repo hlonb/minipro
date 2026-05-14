@@ -14,12 +14,18 @@ Page({
     dialogType: 'staff',
     newStaffName: '',
     newStaffAvatar: '',
+    newStaffGender: '男',
+    genderOptions: ['男', '女'],
     newScriptName: '',
     newScriptTags: '',
     newScriptDesc: '',
     newScriptPrice: '',
     newScriptImage: '',
     newScriptPlayerCount: '',
+    newScriptMaleCount: '',
+    newScriptFemaleCount: '',
+    newScriptDuration: '',
+    newScriptImages: [],
     selectedDifficulty: '',
     selectedRelease: [],
     selectedScriptType: [],
@@ -68,6 +74,7 @@ Page({
       dialogType: 'staff',
       newStaffName: '',
       newStaffAvatar: '',
+      newStaffGender: '男',
     });
   },
 
@@ -81,6 +88,10 @@ Page({
       newScriptPrice: '',
       newScriptImage: '',
       newScriptPlayerCount: '',
+      newScriptMaleCount: '',
+      newScriptFemaleCount: '',
+      newScriptDuration: '',
+      newScriptImages: [],
       selectedDifficulty: '',
       selectedRelease: [],
       selectedScriptType: [],
@@ -119,8 +130,12 @@ Page({
     });
   },
 
+  onSelectGender(e) {
+    this.setData({ newStaffGender: e.currentTarget.dataset.value });
+  },
+
   async onAddStaff() {
-    const { newStaffName, newStaffAvatar } = this.data;
+    const { newStaffName, newStaffAvatar, newStaffGender } = this.data;
     if (!newStaffName.trim()) {
       wx.showToast({ title: '请输入DM名称', icon: 'none' });
       return;
@@ -130,7 +145,7 @@ Page({
       return;
     }
     try {
-      const staffList = await addStaff(newStaffName.trim(), newStaffAvatar);
+      const staffList = await addStaff(newStaffName.trim(), newStaffAvatar, newStaffGender);
       wx.showToast({ title: '添加成功', icon: 'success' });
       this.setData({ showAddDialog: false, staffList });
     } catch (e) {}
@@ -156,6 +171,49 @@ Page({
     this.setData({ newScriptPlayerCount: e.detail.value });
   },
 
+  onScriptMaleCountInput(e) {
+    this.setData({ newScriptMaleCount: e.detail.value });
+  },
+
+  onScriptFemaleCountInput(e) {
+    this.setData({ newScriptFemaleCount: e.detail.value });
+  },
+
+  onScriptDurationInput(e) {
+    this.setData({ newScriptDuration: e.detail.value });
+  },
+
+  onChooseScriptDetailImage() {
+    wx.requirePrivacyAuthorize({
+      success: () => {
+        wx.chooseImage({
+          count: 3,
+          sourceType: ['album', 'camera'],
+          success: async (res) => {
+            for (const tempFilePath of res.tempFilePaths) {
+              const fileID = await uploadFile(tempFilePath, 'scripts/detail');
+              this.data.newScriptImages.push(fileID);
+            }
+            this.setData({ newScriptImages: [...this.data.newScriptImages] });
+          },
+          fail: (err) => {
+            console.error('chooseScriptDetailImage fail:', err);
+            wx.showToast({ title: err.errMsg || '选择图片失败', icon: 'none', duration: 3000 });
+          },
+        });
+      },
+      fail: () => {
+        wx.showToast({ title: '需要同意隐私协议才能选择图片', icon: 'none', duration: 3000 });
+      },
+    });
+  },
+
+  onRemoveScriptDetailImage(e) {
+    const { index } = e.currentTarget.dataset;
+    this.data.newScriptImages.splice(index, 1);
+    this.setData({ newScriptImages: [...this.data.newScriptImages] });
+  },
+
   onSelectPlayerCount(e) {
     this.setData({ newScriptPlayerCount: e.currentTarget.dataset.value });
   },
@@ -165,14 +223,14 @@ Page({
   },
 
   toggleMultiSelect(field, value) {
-    const list = this.data[field];
+    const list = [...this.data[field]];
     const idx = list.indexOf(value);
     if (idx >= 0) {
       list.splice(idx, 1);
     } else {
       list.push(value);
     }
-    this.setData({ [field]: [...list] });
+    this.setData({ [field]: list });
   },
 
   onSelectRelease(e) {
@@ -211,7 +269,7 @@ Page({
   },
 
   async onAddScript() {
-    const { newScriptName, newScriptTags, newScriptDesc, newScriptPrice, newScriptImage, newScriptPlayerCount } = this.data;
+    const { newScriptName, newScriptTags, newScriptDesc, newScriptPrice, newScriptImage, newScriptPlayerCount, newScriptMaleCount, newScriptFemaleCount, newScriptDuration, newScriptImages } = this.data;
     if (!newScriptName.trim()) {
       wx.showToast({ title: '请输入剧本名称', icon: 'none' });
       return;
@@ -233,6 +291,10 @@ Page({
         price: newScriptPrice.trim(),
         image: newScriptImage,
         playerCount: newScriptPlayerCount === '>=10' ? 10 : (parseInt(newScriptPlayerCount) || 0),
+        maleCount: parseInt(newScriptMaleCount) || 0,
+        femaleCount: parseInt(newScriptFemaleCount) || 0,
+        duration: newScriptDuration.trim(),
+        images: newScriptImages,
         difficulty: this.data.selectedDifficulty,
         releaseType: this.data.selectedRelease,
         type: this.data.selectedScriptType,

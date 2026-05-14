@@ -89,10 +89,48 @@
 }
 
 .item-name {
-  flex: 1;
   font-size: 28rpx;
   color: #333;
   margin-left: 20rpx;
+}
+
+.item-name-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  margin-left: 20rpx;
+}
+
+.gender-icon {
+  width: 32rpx;
+  height: 32rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 8rpx;
+}
+
+.gender-icon-male {
+  background: #4a90d9;
+}
+
+.gender-icon-female {
+  background: #f5a0b0;
+}
+
+.gender-icon-text {
+  font-size: 20rpx;
+  color: #fff;
+  line-height: 1;
+}
+
+.gender-option-male.select-option-active {
+  background: #4a90d9;
+}
+
+.gender-option-female.select-option-active {
+  background: #f5a0b0;
 }
 
 .item-delete {
@@ -246,7 +284,7 @@
 }
 
 .dialog-body-scroll {
-  max-height: 500rpx;
+  max-height: 700rpx;
 }
 
 .dialog-footer {
@@ -444,4 +482,85 @@
 
 .confirm-btn-disabled {
   opacity: 0.6;
+}
+
+.detail-images-section {
+  margin-bottom: 12rpx;
+}
+
+.detail-images-upload {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-top: 8rpx;
+}
+
+.detail-images-item {
+  position: relative;
+  width: 160rpx;
+  height: 160rpx;
+}
+
+.detail-images-thumb {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 12rpx;
+}
+
+.detail-images-remove {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 36rpx;
+  height: 36rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 50%;
+}
+
+.detail-images-add {
+  width: 160rpx;
+  height: 160rpx;
+  border: 2rpx dashed #ddd;
+  border-radius: 12rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f9f9f9;
+}
+
+.player-input-group {
+  margin-bottom: 12rpx;
+}
+
+.player-input-row {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 8rpx;
+}
+
+.player-input-item {
+  flex: 0;
+  width: auto;
+  display: flex;
+  align-items: center;
+  border: 1rpx solid #e5e5e5;
+  border-radius: 12rpx;
+  padding: 12rpx 16rpx;
+  background: #f9f9f9;
+}
+
+.player-input-field {
+  width: 80rpx;
+  font-size: 28rpx;
+  color: #333;
+  text-align: center;
+}
+
+.player-input-unit {
+  font-size: 26rpx;
+  color: #666;
+  flex-shrink: 0;
 }

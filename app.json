@@ -19,6 +19,11 @@
       ]
     },
     {
+      "root": "pages/script-detail",
+      "name": "script-detail",
+      "pages": ["index"]
+    },
+    {
       "root": "pages/order",
       "name": "order",
       "pages": [
