@@ -40,17 +40,17 @@ Page({
   },
 
   toggleFilter(field, value) {
-    const list = this.data[field];
     if (value === '全部') {
       this.setData({ [field]: [] });
     } else {
+      const list = [...this.data[field]];
       const idx = list.indexOf(value);
       if (idx >= 0) {
         list.splice(idx, 1);
       } else {
         list.push(value);
       }
-      this.setData({ [field]: [...list] });
+      this.setData({ [field]: list });
     }
     this.applyFilters();
   },

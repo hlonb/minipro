@@ -1,5 +1,5 @@
 <view class="manage-page">
-  <wxs src="./index.wxs" module="utils" />
+  <wxs src="./index.wxs" module="utils"></wxs>
   <!-- Tab切换 -->
   <view class="tab-bar">
     <view class="tab-item {{activeTab === 0 ? 'tab-active' : ''}}" data-tab="{{0}}" bind:tap="onTabChange">

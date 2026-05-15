@@ -1,3 +1,4 @@
+<wxs src="./index.wxs" module="utils"></wxs>
 <view class="scripts-page">
   <!-- 篩選區 -->
   <view class="filter-section">
@@ -41,7 +42,7 @@
       <scroll-view class="filter-scroll" scroll-x enhanced show-scrollbar="{{false}}">
         <view class="filter-options">
           <view
-            class="filter-option {{option === '全部' ? '' : (selectedRelease.indexOf(option) >= 0 ? 'filter-option-active' : '')}}"
+            class="filter-option {{option === '全部' ? (selectedRelease.length === 0 ? 'filter-option-active' : '') : (utils.includes(selectedRelease, option) ? 'filter-option-active' : '')}}"
             wx:for="{{releaseOptions}}"
             wx:for-item="option"
             wx:key="*this"
@@ -58,7 +59,7 @@
       <scroll-view class="filter-scroll" scroll-x enhanced show-scrollbar="{{false}}">
         <view class="filter-options">
           <view
-            class="filter-option {{option === '全部' ? '' : (selectedType.indexOf(option) >= 0 ? 'filter-option-active' : '')}}"
+            class="filter-option {{option === '全部' ? (selectedType.length === 0 ? 'filter-option-active' : '') : (utils.includes(selectedType, option) ? 'filter-option-active' : '')}}"
             wx:for="{{typeOptions}}"
             wx:for-item="option"
             wx:key="*this"
@@ -75,7 +76,7 @@
       <scroll-view class="filter-scroll" scroll-x enhanced show-scrollbar="{{false}}">
         <view class="filter-options">
           <view
-            class="filter-option {{option === '全部' ? '' : (selectedTag.indexOf(option) >= 0 ? 'filter-option-active' : '')}}"
+            class="filter-option {{option === '全部' ? (selectedTag.length === 0 ? 'filter-option-active' : '') : (utils.includes(selectedTag, option) ? 'filter-option-active' : '')}}"
             wx:for="{{tagOptions}}"
             wx:for-item="option"
             wx:key="*this"

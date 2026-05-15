@@ -290,7 +290,7 @@ Page({
         desc: newScriptDesc.trim(),
         price: newScriptPrice.trim(),
         image: newScriptImage,
-        playerCount: newScriptPlayerCount === '>=10' ? 10 : (parseInt(newScriptPlayerCount) || 0),
+        playerCount: (parseInt(newScriptMaleCount) || 0) + (parseInt(newScriptFemaleCount) || 0),
         maleCount: parseInt(newScriptMaleCount) || 0,
         femaleCount: parseInt(newScriptFemaleCount) || 0,
         duration: newScriptDuration.trim(),
