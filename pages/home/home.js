@@ -47,10 +47,21 @@ Page({
     this.setData({ showPhonePopup: false });
   },
 
-  onAvatarPreview(e) {
+  async onAvatarPreview(e) {
     const { url } = e.currentTarget.dataset;
-    const urls = this.data.staffList.map(s => s.avatar);
-    wx.previewImage({ current: url, urls });
+    if (!url) return;
+    let previewUrl = url;
+    const urls = this.data.staffList.map(s => s.avatar).filter(Boolean);
+    if (url.startsWith('cloud://') || urls.some(u => u.startsWith('cloud://'))) {
+      try {
+        const res = await wx.cloud.getTempFileURL({ fileList: urls });
+        const map = {};
+        for (const f of res.fileList) map[f.fileID] = f.tempFileURL;
+        previewUrl = map[url] || url;
+        urls = urls.map(u => map[u] || u);
+      } catch (err) {}
+    }
+    wx.previewImage({ current: previewUrl, urls });
   },
 
   onScriptDetail(e) {

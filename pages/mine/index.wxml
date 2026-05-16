@@ -1,3 +1,14 @@
 <view class="mine-page">
   <text class="mine-title">我的</text>
+  <view class="mine-openid-wrap">
+    <text class="mine-openid-label">我的ID</text>
+    <view class="mine-openid-row" wx:if="{{openid && openid !== '获取中...'}}">
+      <text class="mine-openid">{{openid}}</text>
+      <view class="mine-copy-btn" catch:tap="onCopyId">
+        <text class="mine-copy-btn-text">复制</text>
+      </view>
+    </view>
+    <text class="mine-openid-loading" wx:elif="{{openid === '获取中...' || !openid}}">{{openid || '获取中...'}}</text>
+    <text class="mine-openid-tip" wx:if="{{openid && openid !== '获取中...'}}">将此ID发给管理员即可成为管理员</text>
+  </view>
 </view>

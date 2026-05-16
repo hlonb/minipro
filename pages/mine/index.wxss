@@ -1,11 +1,65 @@
 .mine-page {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   height: 100vh;
+  padding: 24rpx;
 }
 
 .mine-title {
   font-size: 32rpx;
+  color: #999;
+}
+
+.mine-openid-wrap {
+  margin-top: 40rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.mine-openid-label {
+  font-size: 24rpx;
+  color: #666;
+  margin-bottom: 12rpx;
+}
+
+.mine-openid-row {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.mine-openid {
+  font-size: 22rpx;
+  color: #576b95;
+  word-break: break-all;
+  text-align: center;
+  max-width: 480rpx;
+  background: #f0f3f8;
+  padding: 12rpx 24rpx;
+  border-radius: 8rpx;
+}
+
+.mine-copy-btn {
+  background: #576b95;
+  padding: 8rpx 20rpx;
+  border-radius: 20rpx;
+}
+
+.mine-copy-btn-text {
+  font-size: 22rpx;
+  color: #fff;
+}
+
+.mine-openid-tip {
+  font-size: 22rpx;
+  color: #999;
+  margin-top: 12rpx;
+}
+
+.mine-openid-loading {
+  font-size: 24rpx;
   color: #999;
 }

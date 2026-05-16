@@ -3,6 +3,7 @@ import {
   loadScriptList, addScript, deleteScript,
   uploadFile,
   loadShopInfo, saveShopInfo,
+  getAdminList, addAdmin, removeAdmin,
 } from '../../utils/cloudHelper';
 
 Page({
@@ -52,16 +53,33 @@ Page({
     editShopWechatId: '',
     editShopPhone: '',
     shopSaving: false,
+    adminList: [],
+    showAddAdminDialog: false,
+    newAdminOpenid: '',
+    showRemoveAdminConfirm: false,
+    removeAdminOpenid: '',
+    removeAdminId: '',
   },
 
   async onShow() {
+    const app = getApp();
+    if (!app.globalData.isAdmin) {
+      wx.showToast({ title: '仅管理员可访问此页面', icon: 'none', duration: 2000 });
+      wx.switchTab({ url: '/pages/home/home' });
+      return;
+    }
     this.getTabBar().init();
     const [staffList, scriptList, shopInfo] = await Promise.all([
       loadStaffList(),
       loadScriptList(),
       loadShopInfo(),
     ]);
-    this.setData({ staffList, scriptList, shopInfo, loading: false });
+    const adminList = await getAdminList();
+    this.setData({
+      staffList, scriptList, shopInfo, adminList,
+      loading: false,
+      currentOpenid: app.globalData.openid,
+    });
   },
 
   onTabChange(e) {
@@ -393,6 +411,60 @@ Page({
       });
     } catch (e) {
       this.setData({ shopSaving: false });
+    }
+  },
+
+  onShowAddAdmin() {
+    this.setData({ showAddAdminDialog: true, newAdminOpenid: '' });
+  },
+
+  onAddAdminDialogClose() {
+    this.setData({ showAddAdminDialog: false });
+  },
+
+  onAdminOpenidInput(e) {
+    this.setData({ newAdminOpenid: e.detail.value });
+  },
+
+  async onAddAdminConfirm() {
+    const { newAdminOpenid } = this.data;
+    if (!newAdminOpenid.trim()) {
+      wx.showToast({ title: '请输入用户openid', icon: 'none' });
+      return;
+    }
+    try {
+      const adminList = await addAdmin(newAdminOpenid.trim());
+      wx.showToast({ title: '添加成功', icon: 'success' });
+      this.setData({ showAddAdminDialog: false, adminList });
+    } catch (e) {}
+  },
+
+  onRemoveAdmin(e) {
+    const { openid, id } = e.currentTarget.dataset;
+    const app = getApp();
+    if (openid === app.globalData.openid) {
+      wx.showToast({ title: '不能移除自己', icon: 'none' });
+      return;
+    }
+    this.setData({
+      showRemoveAdminConfirm: true,
+      removeAdminOpenid: openid,
+      removeAdminId: id,
+    });
+  },
+
+  onRemoveAdminConfirmClose() {
+    this.setData({ showRemoveAdminConfirm: false });
+  },
+
+  async onConfirmRemoveAdmin() {
+    const { removeAdminOpenid } = this.data;
+    try {
+      const adminList = await removeAdmin(removeAdminOpenid);
+      wx.showToast({ title: '移除成功', icon: 'success' });
+      this.setData({ showRemoveAdminConfirm: false, adminList });
+    } catch (e) {
+      this.setData({ showRemoveAdminConfirm: false });
     }
   },
 });

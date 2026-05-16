@@ -178,7 +178,6 @@ let cloudAvailable = false;
 function checkCloud() {
   try {
     if (wx.cloud) {
-      wx.cloud.init({ traceUser: true });
       cloudAvailable = true;
     }
   } catch (e) {
@@ -213,6 +212,38 @@ async function cloudGetAll(collection, orderBy) {
     allData = allData.concat(res.data);
   }
   return allData;
+}
+
+async function resolveUrls(items) {
+  const urls = [];
+  for (const item of items) {
+    if (item.avatar && item.avatar.startsWith('cloud://')) urls.push(item.avatar);
+    if (item.image && item.image.startsWith('cloud://')) urls.push(item.image);
+    if (item.images && Array.isArray(item.images)) {
+      for (const img of item.images) {
+        if (typeof img === 'string' && img.startsWith('cloud://')) urls.push(img);
+      }
+    }
+  }
+  if (urls.length === 0) return items;
+  try {
+    const res = await wx.cloud.getTempFileURL({ fileList: urls });
+    console.log('resolveUrls tempFileURLs:', res.fileList);
+    const map = {};
+    for (const f of res.fileList) {
+      map[f.fileID] = f.tempFileURL;
+    }
+    for (const item of items) {
+      if (item.avatar && map[item.avatar]) item.avatar = map[item.avatar];
+      if (item.image && map[item.image]) item.image = map[item.image];
+      if (item.images && Array.isArray(item.images)) {
+        item.images = item.images.map(img => map[img] || img);
+      }
+    }
+  } catch (e) {
+    console.error('resolveUrls fail:', e);
+  }
+  return items;
 }
 
 export async function initSeedData() {
@@ -250,7 +281,7 @@ export async function loadStaffList() {
     try {
       const list = await cloudGetAll('staff', 'createdAt');
       console.log('loadStaffList cloud:', list.length);
-      return list;
+      return await resolveUrls(list);
     } catch (e) {
       console.error('loadStaffList cloud fail:', e);
       return getLocal(STAFF_KEY);
@@ -304,7 +335,7 @@ export async function loadScriptList() {
     try {
       const list = await cloudGetAll('scripts', 'createdAt');
       console.log('loadScriptList cloud:', list.length);
-      return list;
+      return await resolveUrls(list);
     } catch (e) {
       console.error('loadScriptList cloud fail:', e);
       return getLocal(SCRIPT_KEY);
@@ -318,7 +349,7 @@ export async function loadScriptById(id) {
     try {
       const db = wx.cloud.database();
       const res = await db.collection('scripts').doc(id).get();
-      return res.data;
+      return (await resolveUrls([res.data]))[0];
     } catch (e) {
       console.error('loadScriptById fail:', e);
       const list = getLocal(SCRIPT_KEY);
@@ -408,14 +439,6 @@ export async function loadShopInfo() {
       return res.data;
     } catch (e) {
       console.error('loadShopInfo cloud fail:', e);
-      try {
-        const db = wx.cloud.database();
-        await db.collection('shop').add({
-          data: { _id: 'shop_main', ...defaultShopInfo, updatedAt: db.serverDate() },
-        });
-      } catch (e2) {
-        console.error('shop seed insert fail:', e2);
-      }
       return { ...defaultShopInfo };
     }
   }
@@ -424,6 +447,84 @@ export async function loadShopInfo() {
     if (local && local.name) return local;
   } catch (e) {}
   return { ...defaultShopInfo };
+}
+
+export async function isAdmin(openid) {
+  if (!cloudAvailable || !openid) return false;
+  try {
+    const db = wx.cloud.database();
+    const res = await db.collection('admins').where({ _openid: openid }).count();
+    return res.total > 0;
+  } catch (e) {
+    console.error('isAdmin fail:', e);
+    return false;
+  }
+}
+
+export async function getAdminList() {
+  if (!cloudAvailable) return [];
+  try {
+    const res = await wx.cloud.callFunction({ name: 'manageAdmin', data: { action: 'list' } });
+    if (res.result && res.result.success) {
+      return res.result.data;
+    }
+    return [];
+  } catch (e) {
+    console.error('getAdminList fail:', e);
+    return [];
+  }
+}
+
+export async function addAdmin(targetOpenid) {
+  if (!cloudAvailable) {
+    wx.showToast({ title: '云开发未开通，无法添加', icon: 'none', duration: 3000 });
+    throw new Error('cloud not available');
+  }
+  try {
+    const res = await wx.cloud.callFunction({ name: 'manageAdmin', data: { action: 'add', targetOpenid } });
+    if (res.result && res.result.success) {
+      return await getAdminList();
+    }
+    wx.showToast({ title: res.result.message || '添加失败', icon: 'none', duration: 3000 });
+    throw new Error(res.result.message);
+  } catch (e) {
+    console.error('addAdmin fail:', e);
+    wx.showToast({ title: '添加管理员失败: ' + (e.errMsg || e.message || '未知错误'), icon: 'none', duration: 5000 });
+    throw e;
+  }
+}
+
+export async function removeAdmin(targetOpenid) {
+  if (!cloudAvailable) {
+    wx.showToast({ title: '云开发未开通，无法移除', icon: 'none', duration: 3000 });
+    throw new Error('cloud not available');
+  }
+  try {
+    const res = await wx.cloud.callFunction({ name: 'manageAdmin', data: { action: 'remove', targetOpenid } });
+    if (res.result && res.result.success) {
+      return await getAdminList();
+    }
+    wx.showToast({ title: res.result.message || '移除失败', icon: 'none', duration: 3000 });
+    throw new Error(res.result.message);
+  } catch (e) {
+    console.error('removeAdmin fail:', e);
+    wx.showToast({ title: '移除管理员失败: ' + (e.errMsg || e.message || '未知错误'), icon: 'none', duration: 5000 });
+    throw e;
+  }
+}
+
+export async function getOpenId() {
+  if (!cloudAvailable) return null;
+  try {
+    const res = await wx.cloud.callFunction({ name: 'getOpenId' });
+    if (res.result && res.result.openid) {
+      return res.result.openid;
+    }
+    return null;
+  } catch (e) {
+    console.error('getOpenId fail:', e);
+    return null;
+  }
 }
 
 export async function saveShopInfo(shopInfo) {
