@@ -5,6 +5,11 @@
       "root": "pages/script-detail",
       "name": "script-detail",
       "pages": ["index"]
+    },
+    {
+      "root": "pages/mine-settings",
+      "name": "mine-settings",
+      "pages": ["index"]
     }
   ],
   "tabBar": {

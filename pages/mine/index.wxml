@@ -1,14 +1,55 @@
 <view class="mine-page">
-  <text class="mine-title">我的</text>
-  <view class="mine-openid-wrap">
-    <text class="mine-openid-label">我的ID</text>
-    <view class="mine-openid-row" wx:if="{{openid && openid !== '获取中...'}}">
-      <text class="mine-openid">{{openid}}</text>
-      <view class="mine-copy-btn" catch:tap="onCopyId">
-        <text class="mine-copy-btn-text">复制</text>
+  <view class="mine-header">
+    <image class="mine-avatar" wx:if="{{avatarUrl}}" src="{{avatarUrl}}" mode="aspectFill" />
+    <view class="mine-avatar-placeholder" wx:else>
+      <text class="mine-avatar-placeholder-icon">U</text>
+    </view>
+    <view class="mine-user-info" bind:tap="onTapLogin">
+      <view class="mine-nickname-row">
+        <text class="mine-nickname">{{nickName}}</text>
+        <view class="mine-arrow" catch:tap="onGoSettings"></view>
+      </view>
+      <view class="mine-id-row" wx:if="{{openid && openid !== '获取中...' && openid !== '获取失败'}}">
+        <text class="mine-id-text">{{openid}}</text>
+        <view class="mine-copy-btn" catch:tap="onCopyId">
+          <text class="mine-copy-btn-text">复制</text>
+        </view>
+      </view>
+      <text class="mine-id-loading" wx:elif="{{openid === '获取中...' || !openid}}">{{openid || '获取中...'}}</text>
+    </view>
+  </view>
+
+  <!-- 登录弹窗 -->
+  <view class="dialog-mask" wx:if="{{showLoginDialog}}" bind:tap="onLoginDialogClose">
+    <view class="dialog-box" catch:tap="noop">
+      <view class="dialog-header">
+        <text class="dialog-title">微信登录</text>
+        <view class="dialog-close" catch:tap="onLoginDialogClose">
+          <text class="dialog-close-text">X</text>
+        </view>
+      </view>
+      <view class="dialog-body">
+        <view class="login-avatar-row">
+          <button class="login-avatar-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
+            <image class="login-avatar-preview" wx:if="{{loginAvatarUrl}}" src="{{loginAvatarUrl}}" mode="aspectFill" />
+            <view class="login-avatar-placeholder" wx:else>
+              <text class="login-avatar-placeholder-icon">U</text>
+              <text class="login-avatar-placeholder-text">获取微信头像</text>
+            </view>
+          </button>
+        </view>
+        <view class="login-nickname-row">
+          <text class="login-label">昵称</text>
+          <input class="login-nickname-input" type="nickname" placeholder="获取微信昵称" value="{{loginNickName}}" bindinput="onLoginNickNameInput" />
+        </view>
+        <view class="login-phone-row">
+          <text class="login-label">手机号</text>
+          <button class="login-phone-btn" open-type="getPhoneNumber" bindgetphonenumber="onGetPhoneNumber">获取微信手机号</button>
+        </view>
+      </view>
+      <view class="dialog-footer">
+        <view class="login-confirm-btn" catch:tap="onLoginConfirm">确认登录</view>
       </view>
     </view>
-    <text class="mine-openid-loading" wx:elif="{{openid === '获取中...' || !openid}}">{{openid || '获取中...'}}</text>
-    <text class="mine-openid-tip" wx:if="{{openid && openid !== '获取中...'}}">将此ID发给管理员即可成为管理员</text>
   </view>
 </view>
