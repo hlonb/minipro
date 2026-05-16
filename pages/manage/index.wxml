@@ -16,8 +16,8 @@
   <!-- DM管理 -->
   <view wx:if="{{activeTab === 0}}">
     <view class="add-btn" bind:tap="onShowAddStaff">
-      <t-icon name="add" size="40rpx" color="#fff" />
-      <text class="add-btn-text">添加DM</text>
+      <t-icon name="add" size="40rpx" color="#fa4126" />
+      <text class="add-btn-text add-btn-text-red">添加DM</text>
     </view>
 
     <view class="item-list" wx:if="{{!loading}}">
@@ -42,8 +42,8 @@
   <!-- 剧本管理 -->
   <view wx:if="{{activeTab === 1}}">
     <view class="add-btn add-btn-script" bind:tap="onShowAddScript">
-      <t-icon name="add" size="40rpx" color="#fff" />
-      <text class="add-btn-text">添加剧本</text>
+      <t-icon name="add" size="40rpx" color="#07c160" />
+      <text class="add-btn-text add-btn-text-green">添加剧本</text>
     </view>
 
     <view class="item-list" wx:if="{{!loading}}">
@@ -95,7 +95,7 @@
         <text class="shop-info-value">{{shopInfo.phone || '未设置'}}</text>
       </view>
       <view class="edit-shop-btn" bind:tap="onShowEditShop">
-        <t-icon name="edit" size="36rpx" color="#fff" />
+        <t-icon name="edit" size="36rpx" color="#fa4126" />
         <text class="edit-shop-btn-text">编辑店铺信息</text>
       </view>
     </view>
@@ -134,7 +134,7 @@
         </view>
       </view>
       <view class="dialog-footer">
-        <view class="confirm-btn" catch:tap="onAddStaff">确认添加</view>
+        <view class="confirm-btn confirm-btn-green" catch:tap="onAddStaff">确认添加</view>
       </view>
     </view>
   </view>
@@ -225,7 +225,7 @@
         </view>
       </scroll-view>
       <view class="dialog-footer">
-        <view class="confirm-btn" catch:tap="onAddScript">确认添加</view>
+        <view class="confirm-btn confirm-btn-green" catch:tap="onAddScript">确认添加</view>
       </view>
     </view>
   </view>
@@ -258,7 +258,7 @@
         </view>
       </view>
       <view class="dialog-footer">
-        <view class="confirm-btn confirm-btn-primary {{shopSaving ? 'confirm-btn-disabled' : ''}}" catch:tap="onSaveShopInfo">
+        <view class="confirm-btn confirm-btn-red {{shopSaving ? 'confirm-btn-disabled' : ''}}" catch:tap="onSaveShopInfo">
           {{shopSaving ? '保存中...' : '保存'}}
         </view>
       </view>
