@@ -84,14 +84,16 @@
 }
 
 .mine-copy-btn {
-  background: #576b95;
-  padding: 4rpx 16rpx;
-  border-radius: 16rpx;
+  background: linear-gradient(135deg, #576b95, #6e83b5);
+  padding: 4rpx 14rpx;
+  border-radius: 28rpx;
+  box-shadow: 0 4rpx 12rpx rgba(87, 107, 149, 0.35);
 }
 
 .mine-copy-btn-text {
-  font-size: 20rpx;
+  font-size: 22rpx;
   color: #fff;
+  font-weight: 500;
 }
 
 .mine-id-loading {
